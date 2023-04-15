@@ -14,8 +14,9 @@ return new class extends Migration
     public function up()
     {
         Schema::create('image__memo', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+            $table->foreignId('image_id')->constrained();
+            $table->foreignId('memo_id')->constrained();
+            $table->primary(['image_id','memo_id']);
         });
     }
 

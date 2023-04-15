@@ -14,8 +14,11 @@ return new class extends Migration
     public function up()
     {
         Schema::create('memos', function (Blueprint $table) {
-            $table->id();
+            $table->unsignedBigInteger('id',true);
+            $table->longText('content');
+            $table->foreignId('user_id')->constrained();
             $table->timestamps();
+            $table->unsignedInteger('del_flg');
         });
     }
 
