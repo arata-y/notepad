@@ -13,11 +13,17 @@ class MemoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $memos = Memo::where('user_id','=',\Auth::id())->where('del_flg','=',0)->orderBy('id','DESC')
-                 ->get();
-        
+        //$memos = Memo::where('user_id','=',\Auth::id())->where('del_flg','=',0)->orderBy('id','DESC')
+        //->get();
+
+        $search = $request->search;
+
+        $query = Memo::search($search);
+
+        $memos = $query->select('*')->orderBy('id','DESC')->paginate(10);
+
         return view('memos.index',compact('memos'));
     }
 
@@ -113,7 +119,9 @@ class MemoController extends Controller
     public function show($id)
     {
         $memo = Memo::find($id);
-        return view('memos.show',compact('memo'));
+        $tags = Memo::find($id)->Tags()->get();
+
+        return view('memos.show',compact('memo','tags'));
     }
 
     /**
@@ -124,7 +132,9 @@ class MemoController extends Controller
      */
     public function edit($id)
     {
-        //
+        $memo = Memo::find($id);
+        $tags = Memo::find($id)->Tags()->get();
+        return view('memos.edit',compact('memo','tags'));
     }
 
     /**

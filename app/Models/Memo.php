@@ -42,4 +42,21 @@ class Memo extends Model
     {
         return $this->belongsToMany(Image::class);
     }
+
+    public function scopeSearch($query,$search)
+    {
+        if ($search !== null)
+        {
+            $search_convert = mb_convert_kana($search,'s');
+
+            $search_split = preg_split('/[\s]+/',$search_convert);
+
+            foreach($search_split as $value)
+            {
+                $query->where('name','like','%'.$value.'%');
+            }
+        }
+
+        return $query;
+    }
 }
