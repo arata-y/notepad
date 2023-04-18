@@ -21,7 +21,7 @@
                             <div class="p-2 w-full">
                               <div class="relative">
                                 <label for="name" class="leading-7 text-sm text-gray-600">タイトル</label>
-                                <input type="text" id="name" name="name" class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
+                                <input type="text" id="name" name="name" value="{{$memo->name}}" placeholder="{{old('name',$memo->name)}}" class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out">
                               </div>
                             </div>
                             <div class="p-2 w-full">
@@ -37,9 +37,9 @@
                                 <label for="tag" class="leading-7 text-sm text-gray-600">タグ</label>
                                 <button class="mx-auto text-white bg-indigo-500 border-0 focus:outline-none hover:bg-indigo-600 rounded text-lg" id="addTagButton">＋</button>
                                 <button class="mx-auto text-white bg-indigo-500 border-0 focus:outline-none hover:bg-indigo-600 rounded text-lg" id="delTagButton">－</button>
-                                <div id="tag-parent" class="tag-parent"><input type="text" id="new_tag" name="new_tag[]" class="tagForm w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out block"></div>
+                                <div id="tag-parent" class="tag-parent"><input type="text" id="new_tag" name="new_tag[]" class="tagForm w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out block" placeholder="タグを入力"></div>
                                 @foreach($tags as $t)
-                                  <input type="checkbox" id="{{ $t['id']}}" name="tags[]" value="{{$t['id']}}">
+                                  <input type="checkbox" id="{{ $t['id']}}" name="tags[]" value="{{$t['id']}}" checked>
                                   <label for="{{$t['id']}}">{{$t['name']}}</label>
                                 @endforeach
                               </div>
@@ -47,11 +47,11 @@
                             <div class="p-2 w-full">
                               <div class="relative">
                                 <label for="message" class="leading-7 text-sm text-gray-600">メモ</label>
-                                <textarea id="message" name="content" class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 h-32 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"></textarea>
+                                <textarea id="message" name="content" class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 h-32 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out">{{$memo->content}}</textarea>
                               </div>
                             </div>
                             <div class="p-2 w-full">
-                              <button class="flex mx-auto text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">Button</button>
+                              <button class="flex mx-auto text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">更新</button>
                             </div>
                           </div>
                         </div>

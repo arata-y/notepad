@@ -12,13 +12,13 @@
                 <button class="text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">検索</button>
             </form>
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                @foreach ($memos as $m)
+                @for  ($i = 0; $i < count($memos); $i++)
                     <div class="p-6 bg-white border-b border-gray-200">
-                        <div class="text-2xl"><a href="{{ route('memos.show',$m->id)}}">{{$m['name']}}</a></div>
-                        <div class="text-sm">{{$m['content']}}</div>
-                        <div class="text-sm">{{$m['updated_at']}}</div>
+                        <div class="text-2xl"><a href="{{ route('memos.show',$memos[$i]['id'])}}">{{$memos[$i]['name']}}</a></div>
+                        <span class="text-sm">{{$dates[$i]}}</span>
+                        <span class="text-sm">{{$memos[$i]['content']}}</span>
                     </div>
-                @endforeach
+                @endfor
             </div>
             {{$memos->links()}}
         </div>

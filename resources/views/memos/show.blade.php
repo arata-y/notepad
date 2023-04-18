@@ -32,9 +32,13 @@
                               <div class="relative">
                                 <label for="tag" class="leading-7 text-sm text-gray-600">タグ</label>
                                 <div id="new_tag" name="new_tag[]" class="tagForm w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out block">
-                                  @foreach($tags as $t)
-                                    #{{$t['name']}}
-                                  @endforeach
+                                  @if (isset($tags[0]->name))
+                                    @foreach($tags as $t)
+                                      #{{$t['name']}}
+                                    @endforeach
+                                  @else
+                                    タグがありません
+                                  @endif
                                 </div>
                               </div>
                             </div>

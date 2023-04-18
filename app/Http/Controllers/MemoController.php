@@ -24,7 +24,16 @@ class MemoController extends Controller
 
         $memos = $query->select('*')->orderBy('id','DESC')->paginate(10);
 
-        return view('memos.index',compact('memos'));
+        for ($i = 0; $i < count($memos); $i++)
+        {
+            // 更新日時の表記の成形
+            $replace_dates[$i] = str_replace('-','/',$memos[$i]['updated_at']);
+
+            // 更新日時の年月日のみに成形
+            $dates[$i] = substr($replace_dates[$i],0,10);
+        }
+
+        return view('memos.index',compact('memos','dates'));
     }
 
     /**
@@ -134,6 +143,7 @@ class MemoController extends Controller
     {
         $memo = Memo::find($id);
         $tags = Memo::find($id)->Tags()->get();
+
         return view('memos.edit',compact('memo','tags'));
     }
 
