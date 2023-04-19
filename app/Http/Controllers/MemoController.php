@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Memo;
 use App\Models\Tag;
+use App\Models\Image;
 
 class MemoController extends Controller
 {
@@ -28,12 +29,14 @@ class MemoController extends Controller
         {
             // 更新日時の表記の成形
             $replace_dates[$i] = str_replace('-','/',$memos[$i]['updated_at']);
-
+            
             // 更新日時の年月日のみに成形
             $dates[$i] = substr($replace_dates[$i],0,10);
+            
+            $images[$i] = Memo::find($memos[$i]['id'])->Images()->get();
         }
 
-        return view('memos.index',compact('memos','dates'));
+        return view('memos.index',compact('memos','dates','images'));
     }
 
     /**
@@ -61,6 +64,11 @@ class MemoController extends Controller
      */
     public function store(Request $request)
     {
+        $date = date("Y/m/d");
+        $replace_dete = str_replace('/','',$date);
+        
+        $dir = 'image_'.$replace_dete;
+
         /*1.メモテーブルへのインサート
           2.新規タグ(new_tag)がtagsテーブルにあるか確認する
             ->新規タグは複数(5個)同時に作成ができるため、配列に格納する
@@ -116,6 +124,30 @@ class MemoController extends Controller
             }
         }
 
+        for($image_i = 0; $image_i < count($request->file('new_image')); $image_i++)
+        {
+            // 画像ファイルの名前を取得
+            $image_names[$image_i] = $request->file('new_image')[$image_i]->getClientOriginalName();
+
+            // 画像ファイルのアップロード
+            $request->file('new_image')[$image_i]->storeAs('public/'.$dir,$image_names[$image_i]);
+
+            // アップロードした画像ファイルのパスを取得
+            $file_paths[$image_i] = 'storage/'.$dir.'/'. $image_names[$image_i];
+
+            // imageテーブルへインサート
+            $image = Image::create([
+                'name' => $image_names[$image_i],
+                'path' => $file_paths[$image_i],
+                'user_id' => \Auth::id(),
+                'del_flg' => 0,
+            ]);
+
+            $image_id = $image->id;
+
+            $memo->Images()->attach(['image_id' => $image_id]);
+        }
+
         return to_route('memos.index');
     }
 
@@ -129,8 +161,9 @@ class MemoController extends Controller
     {
         $memo = Memo::find($id);
         $tags = Memo::find($id)->Tags()->get();
+        $images = Memo::find($id)->Images()->get();
 
-        return view('memos.show',compact('memo','tags'));
+        return view('memos.show',compact('memo','tags','images'));
     }
 
     /**

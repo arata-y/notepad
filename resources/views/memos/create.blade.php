@@ -10,7 +10,7 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 bg-white border-b border-gray-200">
                     <section class="text-gray-600 body-font relative">
-                      <form method="post" action="{{ route('memos.store')}}">
+                      <form method="post" action="{{ route('memos.store')}}" enctype="multipart/form-data">
                         @csrf
                         <div class="container px-5 py-24 mx-auto">
                           <div class="flex flex-col text-center w-full">
@@ -29,7 +29,7 @@
                                   <label for="image" class="leading-7 text-sm text-gray-600">画像</label>
                                   <button class="mx-auto text-white bg-indigo-500 border-0 focus:outline-none hover:bg-indigo-600 rounded text-lg" id="addImageButton">＋</button>
                                   <button class="mx-auto text-white bg-indigo-500 border-0 focus:outline-none hover:bg-indigo-600 rounded text-lg" id="delImageButton">－</button>
-                                  <div id="image-parent" class="image-parent"><input type="file" id="image" name="new_image[]" class="imageForm w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out block"></div>
+                                  <div id="image-parent" class="image-parent"><input type="file" id="image" name="new_image[]" class="imageForm w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out block" multiple></div>
                                 </div>
                               </div>
                               <div class="p-2 w-full">

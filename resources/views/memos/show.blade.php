@@ -25,7 +25,13 @@
                             <div class="p-2 w-full">
                               <div class="relative">
                                 <label for="image" class="leading-7 text-sm text-gray-600">画像</label>
-                                <div id="image" name="new_image[]" class="imageForm w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out block">{{$memo->image}}</div>
+                                @if (isset($images[0]->path))
+                                  @foreach($images as $image)
+                                    <img src="{{ asset($image->path) }}" class="imageForm w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out block">
+                                  @endforeach
+                                @else
+                                  <div id="image" name="new_image[]" class="imageForm w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out block">画像がありません</div>
+                                @endif
                               </div>
                             </div>
                             <div class="p-2 w-full">

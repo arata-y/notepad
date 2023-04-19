@@ -14,9 +14,12 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 @for  ($i = 0; $i < count($memos); $i++)
                     <div class="p-6 bg-white border-b border-gray-200">
-                        <div class="text-2xl"><a href="{{ route('memos.show',$memos[$i]['id'])}}">{{$memos[$i]['name']}}</a></div>
+                        <a href="{{ route('memos.show',$memos[$i]['id'])}}" class="text-2xl block w-96">{{$memos[$i]['name']}}</a>
                         <span class="text-sm">{{$dates[$i]}}</span>
                         <span class="text-sm">{{$memos[$i]['content']}}</span>
+                        @if (isset($images[$i][0]->path))
+                            <img src="{{ asset($images[$i][0]->path) }}" class="bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out w-40 h-32 inline">
+                        @endif
                     </div>
                 @endfor
             </div>
