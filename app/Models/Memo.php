@@ -59,4 +59,9 @@ class Memo extends Model
 
         return $query;
     }
+
+    public function scopeWhereAriveMemo($query)
+    {
+        return $query->where('del_flg', '=', 0);
+    }
 }

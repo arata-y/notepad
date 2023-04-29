@@ -16,14 +16,14 @@ class MemoController extends Controller
      */
     public function index(Request $request)
     {
-        //$memos = Memo::where('user_id','=',\Auth::id())->where('del_flg','=',0)->orderBy('id','DESC')
-        //->get();
-
+        // 検索バーに入力された文字を取得
         $search = $request->search;
 
+        // メモ一覧からあいまい検索を実施
         $query = Memo::search($search);
 
-        $memos = $query->select('*')->orderBy('id','DESC')->paginate(10);
+        // メモの一覧を取得
+        $memos = Memo::whereAriveMemo()->orderBy('id','DESC')->paginate(10);
 
         for ($i = 0; $i < count($memos); $i++)
         {
@@ -46,10 +46,7 @@ class MemoController extends Controller
      */
     public function create()
     {
-        /*1.tagsテーブルからデータを取得
-          2.ビューにtagsテーブルから取得したデータを渡す
-        */
-
+        // 既存のタグを取得
         $tags = Tag::where('user_id','=',\Auth::id())->where('del_flg','=',0)->orderBy('id','DESC')
                 ->get();
 
@@ -64,18 +61,13 @@ class MemoController extends Controller
      */
     public function store(Request $request)
     {
+        // 日時を取得
         $date = date("Y/m/d");
+
         $replace_dete = str_replace('/','',$date);
         
+        // 画像ファイルを格納するディレクトリ
         $dir = 'image_'.$replace_dete;
-
-        /*1.メモテーブルへのインサート
-          2.新規タグ(new_tag)がtagsテーブルにあるか確認する
-            ->新規タグは複数(5個)同時に作成ができるため、配列に格納する
-            　そのため、繰り返しでtagsテーブルに存在するか確認する
-          3.新規タグだった場合はtagsテーブルにインサート,memo_tagテーブルにインサート
-          4.既存のタグが選択された場合は、memo_tagsテーブルにインサートする
-        */
 
         // メモテーブルへインサート
            $memo = Memo::create([
@@ -85,12 +77,11 @@ class MemoController extends Controller
                'del_flg' => 0,
            ]);
 
-        // 既存のタグを取得(配列)
+        // 既存のタグを取得
         $tag_exists = Tag::where('user_id', '=',\Auth::id())->whereIn('name',$request->new_tag)
         ->exists();
 
-        // 新規タグの入力があった場合
-        // tagsテーブルに存在しなかった場合
+        // 新規タグの入力がされた場合かつ、tagsテーブルに存在しない場合
         if (!empty($request->new_tag[0]) && !$tag_exists)
         {
             // tag_idを配列で取得
@@ -160,7 +151,9 @@ class MemoController extends Controller
     public function show($id)
     {
         $memo = Memo::find($id);
+
         $tags = Memo::find($id)->Tags()->get();
+
         $images = Memo::find($id)->Images()->get();
 
         return view('memos.show',compact('memo','tags','images'));
@@ -175,9 +168,15 @@ class MemoController extends Controller
     public function edit($id)
     {
         $memo = Memo::find($id);
-        $tags = Memo::find($id)->Tags()->get();
 
-        return view('memos.edit',compact('memo','tags'));
+        $memo_tags = Memo::find($id)->Tags()->get();
+        
+        $tags = Tag::where('user_id','=',\Auth::id())->where('del_flg','=',0)->orderBy('id','DESC')
+                ->get();
+
+        $images = Memo::find($id)->Images()->get();
+
+        return view('memos.edit',compact('memo','tags','images','memo_tags'));
     }
 
     /**
@@ -189,7 +188,104 @@ class MemoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        // 日時を取得
+        $date = date("Y/m/d");
+        $replace_dete = str_replace('/','',$date);
+        
+        // 画像ファイルを格納するディレクトリ名
+        $dir = 'image_'.$replace_dete;
+
+        $memo = Memo::find($id);
+        
+        $memo->name = $request->name;
+
+        $memo->content = $request->content;
+
+        $memo->save();
+
+        // メモとタグの紐づけを解除
+        $memo->Tags()->detach();
+
+        // チェックボックスで既存のタグが選択された場合
+        if (isset($request->tags))
+        {
+            foreach($request->tags as $tag)
+            {
+                // memoテーブルとtagテーブルの紐づけを追加
+                $memo->Tags()->attach(['tag_id' => $tag]);
+            }
+        }
+
+        // 既存のタグを取得(配列)
+        $tag_exists = Tag::where('user_id', '=',\Auth::id())->whereIn('name',$request->new_tag)
+        ->exists();
+
+        // 新規タグの入力がされた場合かつ、tagsテーブルに存在しない場合
+        if (!empty($request->new_tag[0]) && !$tag_exists)
+        {
+            // tag_idを配列で取得
+            for($tag_i = 0; $tag_i < count($request->new_tag); $tag_i++)
+            {
+                // タグテーブルのインサート
+                $tag = Tag::create([
+                'name' => $request->new_tag[$tag_i],
+                'user_id' => \Auth::id(),
+                'del_flg' => 0,
+                ]);
+
+                // タグidの取得
+                $tag_id = $tag->id;
+
+                // memoテーブルとtagテーブルの紐づけを追加
+                $memo->Tags()->attach(['tag_id' => $tag_id]);
+            }
+        }
+
+        // メモと画像の紐づけを解除
+        $memo->Images()->detach();
+
+        // チェックボックスで既存の画像が選択された場合
+        if (isset($request->images))
+        {
+            foreach($request->images as $image)
+            {
+                // memoテーブルとimageテーブルの紐づけを追加
+                $memo->Images()->attach(['image_id' => $image]);
+            }
+        }
+
+        // 新規画像の入力された場合
+        if (!empty($request->file('new_image')[0]))
+        {
+            // tag_idを配列で取得
+            for($image_i = 0; $image_i < count($request->file('new_image')); $image_i++)
+            {
+                // 画像ファイルの名前を取得
+                $image_names[$image_i] = $request->file('new_image')[$image_i]->getClientOriginalName();
+
+                // 画像ファイルのアップロード
+                $request->file('new_image')[$image_i]->storeAs('public/'.$dir,$image_names[$image_i]);
+
+                // アップロードした画像ファイルのパスを取得
+                $file_paths[$image_i] = 'storage/'.$dir.'/'. $image_names[$image_i];
+
+                // 画像テーブルのインサート
+                $image = Image::create([
+                'name' => $image_names[$image_i],
+                'path' => $file_paths[$image_i],
+                'user_id' => \Auth::id(),
+                'del_flg' => 0,
+                ]);
+
+                // タグidの取得
+                $image_id = $image->id;
+
+                // memoテーブルとtagテーブルの紐づけを追加
+                $memo->Images()->attach(['image_id' => $image_id]);
+            }
+        }
+
+        return  to_route('memos.index');
     }
 
     /**
@@ -200,6 +296,12 @@ class MemoController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $memo = Memo::find($id);
+
+        $memo->del_flg = 1;
+
+        $memo->save();
+
+        return  to_route('memos.index');
     }
 }

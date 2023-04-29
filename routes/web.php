@@ -26,6 +26,20 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
 
+
+/*Route::prefix('memos')
+->middleware(['auth'])
+->controller(MemoController::class)
+->name('memos.')
+->group(function(){
+    Route::get('/','index')->name('index');
+    Route::get('/create', 'create')->name('create');
+    Route::post('/','store')->name('store');
+    Route::get('/{id}','show')->name('show');
+    Route::get('/{id}/edit','edit')->name('edit');
+    Route::post('/{id}','post')->name('post');
+});*/
+
 Route::resource('memos', MemoController::class);
 
 require __DIR__.'/auth.php';

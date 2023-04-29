@@ -10,7 +10,8 @@
           <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
               <div class="p-6 bg-white border-b border-gray-200">
                   <section class="text-gray-600 body-font relative">
-                    <form method="post" action="{{ route('memos.store')}}">
+                    <form method="post" action="{{route('memos.update',[$memo['id']])}}" enctype="multipart/form-data">
+                      @method('PUT')
                       @csrf
                       <div class="container px-5 py-24 mx-auto">
                         <div class="flex flex-col text-center w-full">
@@ -29,6 +30,14 @@
                                 <label for="image" class="leading-7 text-sm text-gray-600">画像</label>
                                 <button class="mx-auto text-white bg-indigo-500 border-0 focus:outline-none hover:bg-indigo-600 rounded text-lg" id="addImageButton">＋</button>
                                 <button class="mx-auto text-white bg-indigo-500 border-0 focus:outline-none hover:bg-indigo-600 rounded text-lg" id="delImageButton">－</button>
+                                @if (isset($images[0]->path))
+                                  @foreach($images as $image)
+                                  <div class="relative inline-block image">
+                                    <img src="{{ asset($image->path) }}" class="imageForm w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out block">
+                                    <input type="checkbox" id="{{ $image['id']}}" name="images[]" value="{{$image['id']}}" class="absolute block right-0 top-0 scale-125" checked>
+                                  </div>
+                                  @endforeach
+                                @endif
                                 <div id="image-parent" class="image-parent"><input type="file" id="image" name="new_image[]" class="imageForm w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out block"></div>
                               </div>
                             </div>
@@ -39,7 +48,11 @@
                                 <button class="mx-auto text-white bg-indigo-500 border-0 focus:outline-none hover:bg-indigo-600 rounded text-lg" id="delTagButton">－</button>
                                 <div id="tag-parent" class="tag-parent"><input type="text" id="new_tag" name="new_tag[]" class="tagForm w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out block" placeholder="タグを入力"></div>
                                 @foreach($tags as $t)
-                                  <input type="checkbox" id="{{ $t['id']}}" name="tags[]" value="{{$t['id']}}" checked>
+                                  <input type="checkbox" id="{{ $t['id']}}" name="tags[]" value="{{$t['id']}}" class="tag"
+                                  @foreach($memo_tags as $mt)
+                                    @if ($t['id'] === $mt['id']) checked>
+                                    @endif
+                                  @endforeach
                                   <label for="{{$t['id']}}">{{$t['name']}}</label>
                                 @endforeach
                               </div>
