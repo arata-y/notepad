@@ -57,11 +57,22 @@ class Memo extends Model
             }
         }
 
+
         return $query;
     }
 
     public function scopeWhereAriveMemo($query)
     {
         return $query->where('del_flg', '=', 0);
+    }
+
+    public function insertMemo($name,$content,$user_id,$del_flg)
+    {
+        return $this->create([
+            'name' => $name,
+            'content' => $content,
+            'user_id' => $user_id,
+            'del_flg' => $del_flg,
+        ]);
     }
 }
